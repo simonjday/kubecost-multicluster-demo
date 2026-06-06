@@ -16,3 +16,5 @@ federated-store*.yaml
 .vscode/
 .idea/
 *.swp
+
+medium-post.md
