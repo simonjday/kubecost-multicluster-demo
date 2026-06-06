@@ -293,7 +293,7 @@ helm repo update minio
 
 helm install minio minio/minio \
   -n minio --create-namespace \
-  --set rootUser=<MINIO_PASSWORD> \
+  --set rootUser=<MINIO_USER> \
   --set rootPassword=<MINIO_PASSWORD> \
   --set mode=standalone \
   --set replicas=1 \
@@ -321,7 +321,7 @@ MINIO_POD=$(kubectl get pod -n minio -l app=minio \
 kubectl port-forward -n minio pod/${MINIO_POD} 9000:9000 --context kind-kubecost-primary &
 
 # Create bucket
-mc alias set kubecost-minio http://localhost:9000 <MINIO_PASSWORD> <MINIO_PASSWORD>
+mc alias set kubecost-minio http://localhost:9000 <MINIO_USER> <MINIO_PASSWORD>
 mc mb kubecost-minio/kubecost-federated
 mc ls kubecost-minio
 ```
