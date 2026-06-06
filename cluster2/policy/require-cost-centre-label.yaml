@@ -1,0 +1,37 @@
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: require-cost-centre-label
+  annotations:
+    policies.kyverno.io/title: Require Cost Centre Label
+    policies.kyverno.io/description: >-
+      All workloads in team namespaces must carry a 'cost-centre' label to
+      enable cross-team chargeback reporting in Kubecost.
+spec:
+  validationFailureAction: Enforce
+  background: true
+  rules:
+  - name: check-cost-centre-label
+    match:
+      any:
+      - resources:
+          kinds:
+          - Deployment
+          - StatefulSet
+          - DaemonSet
+          namespaces:
+          - team-alpha
+          - team-beta
+          - team-gamma
+          - team-delta
+    validate:
+      message: "Label 'cost-centre' is required on workload metadata and pod template for chargeback reporting."
+      pattern:
+        metadata:
+          labels:
+            cost-centre: "?*"
+        spec:
+          template:
+            metadata:
+              labels:
+                cost-centre: "?*"

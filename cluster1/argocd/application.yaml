@@ -1,0 +1,33 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: kubecost-multicluster-demo-c1
+  namespace: argocd
+  labels:
+    app: kubecost-multicluster-demo
+    cluster: kubecost-primary
+spec:
+  project: default
+  source:
+    repoURL: http://gitea-http.gitea.svc.cluster.local:3000/<GITEA_ADMIN_USER>/kubecost-multicluster-demo.git
+    targetRevision: main
+    path: cluster1
+    directory:
+      recurse: true
+      exclude: 'argocd/**'
+  destination:
+    server: https://kubernetes.default.svc
+  ignoreDifferences:
+  - group: kyverno.io
+    kind: ClusterPolicy
+    jsonPointers:
+    - /status
+    - /spec
+    - /metadata/annotations
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+    - CreateNamespace=false
+    - ServerSideApply=true

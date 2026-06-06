@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: team-gamma
+  labels:
+    team: gamma
+    cost-centre: data
+    environment: demo
+    cluster: kubecost-secondary

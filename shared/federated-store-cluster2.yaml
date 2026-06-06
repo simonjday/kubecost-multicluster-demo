@@ -1,0 +1,19 @@
+# Federated store secret for cluster2 (secondary)
+# MinIO is on cluster1 — use Docker network IP + NodePort
+# Update CLUSTER1_IP if your kind Docker network differs from <CLUSTER1_DOCKER_IP>
+# Apply: kubectl apply -f shared/federated-store-cluster2.yaml -n kubecost --context kind-kubecost-secondary
+apiVersion: v1
+kind: Secret
+metadata:
+  name: federated-store
+  namespace: kubecost
+stringData:
+  federated-store.yaml: |
+    type: S3
+    config:
+      bucket: kubecost-federated
+      endpoint: <CLUSTER1_DOCKER_IP>:30900
+      access_key: <MINIO_PASSWORD>
+      secret_key: <MINIO_PASSWORD>
+      insecure: true
+      signature_version2: false

@@ -1,0 +1,51 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: delta-app
+  namespace: team-delta
+  labels:
+    team: delta
+    cost-centre: data
+    app: delta-app
+    environment: demo
+    cluster: kubecost-secondary
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: delta-app
+  template:
+    metadata:
+      labels:
+        team: delta
+        cost-centre: data
+        app: delta-app
+        environment: demo
+        cluster: kubecost-secondary
+    spec:
+      containers:
+      - name: app
+        image: nginx:alpine
+        resources:
+          requests:
+            cpu: 200m
+            memory: 256Mi
+          limits:
+            cpu: 400m
+            memory: 512Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: delta-app
+  namespace: team-delta
+  labels:
+    team: delta
+    cost-centre: data
+    app: delta-app
+spec:
+  selector:
+    app: delta-app
+  ports:
+  - port: 80
+    targetPort: 80

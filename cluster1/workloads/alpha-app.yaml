@@ -1,0 +1,51 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: alpha-app
+  namespace: team-alpha
+  labels:
+    team: alpha
+    cost-centre: engineering
+    app: alpha-app
+    environment: demo
+    cluster: kubecost-primary
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: alpha-app
+  template:
+    metadata:
+      labels:
+        team: alpha
+        cost-centre: engineering
+        app: alpha-app
+        environment: demo
+        cluster: kubecost-primary
+    spec:
+      containers:
+      - name: app
+        image: nginx:alpine
+        resources:
+          requests:
+            cpu: 100m
+            memory: 128Mi
+          limits:
+            cpu: 200m
+            memory: 256Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: alpha-app
+  namespace: team-alpha
+  labels:
+    team: alpha
+    cost-centre: engineering
+    app: alpha-app
+spec:
+  selector:
+    app: alpha-app
+  ports:
+  - port: 80
+    targetPort: 80

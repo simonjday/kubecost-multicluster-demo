@@ -1,0 +1,51 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: beta-app
+  namespace: team-beta
+  labels:
+    team: beta
+    cost-centre: platform
+    app: beta-app
+    environment: demo
+    cluster: kubecost-primary
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: beta-app
+  template:
+    metadata:
+      labels:
+        team: beta
+        cost-centre: platform
+        app: beta-app
+        environment: demo
+        cluster: kubecost-primary
+    spec:
+      containers:
+      - name: app
+        image: nginx:alpine
+        resources:
+          requests:
+            cpu: 500m
+            memory: 512Mi
+          limits:
+            cpu: 750m
+            memory: 768Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: beta-app
+  namespace: team-beta
+  labels:
+    team: beta
+    cost-centre: platform
+    app: beta-app
+spec:
+  selector:
+    app: beta-app
+  ports:
+  - port: 80
+    targetPort: 80

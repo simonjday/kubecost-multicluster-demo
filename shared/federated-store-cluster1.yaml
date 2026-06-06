@@ -1,0 +1,18 @@
+# Federated store secret for cluster1 (primary)
+# MinIO is in-cluster — use the internal service DNS name
+# Apply: kubectl apply -f shared/federated-store-cluster1.yaml -n kubecost --context kind-kubecost-primary
+apiVersion: v1
+kind: Secret
+metadata:
+  name: federated-store
+  namespace: kubecost
+stringData:
+  federated-store.yaml: |
+    type: S3
+    config:
+      bucket: kubecost-federated
+      endpoint: minio.minio.svc.cluster.local:9000
+      access_key: <MINIO_PASSWORD>
+      secret_key: <MINIO_PASSWORD>
+      insecure: true
+      signature_version2: false

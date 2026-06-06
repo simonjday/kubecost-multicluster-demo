@@ -1,0 +1,38 @@
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: require-team-label
+  annotations:
+    policies.kyverno.io/title: Require Team Label
+    policies.kyverno.io/description: >-
+      All workloads in team namespaces must carry a 'team' label to ensure
+      accurate cost attribution in Kubecost. Unlabelled workloads are blocked
+      at admission.
+spec:
+  validationFailureAction: Enforce
+  background: true
+  rules:
+  - name: check-team-label
+    match:
+      any:
+      - resources:
+          kinds:
+          - Deployment
+          - StatefulSet
+          - DaemonSet
+          namespaces:
+          - team-alpha
+          - team-beta
+          - team-gamma
+          - team-delta
+    validate:
+      message: "Label 'team' is required on workload metadata and pod template for cost attribution."
+      pattern:
+        metadata:
+          labels:
+            team: "?*"
+        spec:
+          template:
+            metadata:
+              labels:
+                team: "?*"

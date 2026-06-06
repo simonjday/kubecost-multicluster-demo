@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: team-alpha
+  labels:
+    team: alpha
+    cost-centre: engineering
+    environment: demo
+    cluster: kubecost-secondary

@@ -1,0 +1,37 @@
+# Kubecost primary cluster values — v3.2.0
+# Cluster: kind-kubecost-primary (cluster1)
+# Role: Primary — hosts UI, aggregator, federator, and reads combined data from MinIO
+#
+# Upgrade:
+#   helm upgrade kubecost kubecost3/kubecost \
+#     -n kubecost \
+#     -f cluster1/kubecost/values-primary.yaml \
+#     --kube-context kind-kubecost-primary
+
+global:
+  clusterId: "kubecost-primary"
+  federatedStorage:
+    existingSecret: "federated-store"
+    fileName: "federated-store.yaml"
+
+defaultModelPricing:
+  enabled: true
+  CPU: "0.031611"
+  RAM: "0.004237"
+  storage: "0.00005479452"
+
+# UI enabled on primary (default, explicitly set for clarity)
+frontend:
+  enabled: true
+
+# Push this cluster's metrics to federated storage
+finopsagent:
+  enabled: true
+
+# Aggregate combined data from all clusters
+federator:
+  enabled: true
+
+kube-state-metrics:
+  extraArgs:
+  - --metric-labels-allowlist=pods=[team,cost-centre,environment,app,cluster]

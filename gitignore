@@ -1,0 +1,18 @@
+# Local environment overrides
+*.local.yaml
+*.local.yml
+*.override.yaml
+
+# Secrets — never commit real credentials
+*secret*.yaml
+*secret*.yml
+federated-store*.yaml
+
+# OS
+.DS_Store
+.DS_Store?
+
+# Editor
+.vscode/
+.idea/
+*.swp

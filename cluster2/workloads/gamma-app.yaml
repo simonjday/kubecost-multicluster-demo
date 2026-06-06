@@ -1,0 +1,51 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: gamma-app
+  namespace: team-gamma
+  labels:
+    team: gamma
+    cost-centre: data
+    app: gamma-app
+    environment: demo
+    cluster: kubecost-secondary
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: gamma-app
+  template:
+    metadata:
+      labels:
+        team: gamma
+        cost-centre: data
+        app: gamma-app
+        environment: demo
+        cluster: kubecost-secondary
+    spec:
+      containers:
+      - name: app
+        image: nginx:alpine
+        resources:
+          requests:
+            cpu: 50m
+            memory: 64Mi
+          limits:
+            cpu: 100m
+            memory: 128Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: gamma-app
+  namespace: team-gamma
+  labels:
+    team: gamma
+    cost-centre: data
+    app: gamma-app
+spec:
+  selector:
+    app: gamma-app
+  ports:
+  - port: 80
+    targetPort: 80

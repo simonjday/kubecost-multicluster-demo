@@ -1,0 +1,28 @@
+# Kubecost secondary cluster values — v3.2.0
+# Cluster: kind-kubecost-secondary (cluster2)
+# Role: Agent only — pushes metrics to MinIO on cluster1, no UI
+
+global:
+  clusterId: "kubecost-secondary"
+  federatedStorage:
+    existingSecret: "federated-store"
+    fileName: "federated-store.yaml"
+
+defaultModelPricing:
+  enabled: true
+  CPU: "0.031611"
+  RAM: "0.004237"
+  storage: "0.00005479452"
+
+finopsagent:
+  enabled: true
+
+frontend:
+  enabled: false
+
+federator:
+  enabled: false
+
+kube-state-metrics:
+  extraArgs:
+  - --metric-labels-allowlist=pods=[team,cost-centre,environment,app,cluster]
