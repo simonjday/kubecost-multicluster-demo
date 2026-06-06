@@ -17,4 +17,5 @@ federated-store*.yaml
 .idea/
 *.swp
 
+# Draft content — not for public repo
 medium-post.md
