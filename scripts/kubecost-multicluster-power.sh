@@ -28,6 +28,25 @@ ok()   { echo -e "${GREEN}[OK]${NC}    $1"; }
 warn() { echo -e "${YELLOW}[WARN]${NC}  $1"; }
 err()  { echo -e "${RED}[ERROR]${NC} $1"; }
 
+ensure_applicationset_crd() {
+  local context="$1"
+
+  if kubectl get crd applicationsets.argoproj.io --context "$context" >/dev/null 2>&1; then
+    ok "ApplicationSet CRD present on $context"
+    return 0
+  fi
+
+  warn "ApplicationSet CRD missing on $context — restoring"
+  if curl -fsSL https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/crds/applicationset-crd.yaml \
+    | kubectl apply --server-side --force-conflicts --context "$context" -f - >/dev/null; then
+    ok "ApplicationSet CRD restored on $context"
+    return 0
+  fi
+
+  err "Failed to restore ApplicationSet CRD on $context"
+  return 1
+}
+
 check_context() {
   kubectl config get-contexts "$1" &>/dev/null
 }
@@ -153,6 +172,10 @@ startup() {
     exit 1
   fi
 
+  log "Verifying ArgoCD ApplicationSet CRD on both clusters..."
+  ensure_applicationset_crd "$PRIMARY"
+  ensure_applicationset_crd "$SECONDARY"
+
   log "Starting Kubecost agent on secondary..."
   kubectl scale statefulset kubecost-aggregator -n kubecost --replicas=1 --context "$SECONDARY" 2>/dev/null && \
     ok "kubecost-aggregator starting" || warn "kubecost-aggregator not found"
@@ -189,6 +212,11 @@ status() {
   for ctx in "$PRIMARY" "$SECONDARY"; do
     log "--- $ctx ---"
     if check_context "$ctx"; then
+      echo "  ArgoCD applications:"
+      kubectl get applications -n argocd --context "$ctx" \
+        --no-headers 2>/dev/null | awk '{print "  " $1 "\tSYNC=" $2 "\tHEALTH=" $3}' || warn "argocd applications not found"
+      echo ""
+      echo "  Kubecost pods:"
       kubectl get pods -n kubecost --context "$ctx" \
         --no-headers 2>/dev/null | awk '{print "  "$1"\t"$3"\t"$4}' || warn "kubecost namespace not found"
     else
@@ -208,7 +236,7 @@ case "${1:-}" in
     echo ""
     echo "  start   — start Docker containers then scale up all components"
     echo "  stop    — scale down all components then stop Docker containers"
-    echo "  status  — show pod status across both clusters"
+    echo "  status  — show ArgoCD sync/health and Kubecost pods across both clusters"
     exit 1
     ;;
 esac
